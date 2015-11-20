@@ -12,7 +12,7 @@ Notes:
 Notes:
 
 ```{r Pseudo-Facebook User Data}
-
+setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
 pf <- read.csv("pseudo_facebook.tsv",sep = "\t")
 names(pf)
 ```
@@ -23,6 +23,7 @@ names(pf)
 Notes:
 
 ```{r Histogram of Users\' Birthdays}
+install.packages("ggplot2")
 library(ggplot2)
 qplot(x=dob_day, data=pf) +
   scale_x_discrete(breaks=1:31)
@@ -36,8 +37,7 @@ Response:
 ***
 
 ### Moira's Investigation
-Notes:
-
+Notes:Moira investigation was about taking a set of Facebook users and performing a survey on the perceived audience size of their posts.  Participants were asked what percentage of their facebook users actually saw the post.  Link to the paper is [here](http://hci.stanford.edu/publications/2013/invisibleaudience/invisibleaudience.pdf)
 ***
 
 ### Estimating Your Audience Size
@@ -46,25 +46,27 @@ Notes:
 ***
 
 #### Think about a time when you posted a specific message or shared a photo on Facebook. What was it?
-Response:
+Response: When I got engaged.
 
 #### How many of your friends do you think saw that post?
-Response:
+Response:400
 
 #### Think about what percent of your friends on Facebook see any posts or comments that you make in a month. What percent do you think that is?
-Response:
+Response:40%
 
 ***
 
 ### Perceived Audience Size
-Notes:
+Notes: Based on Moira's Investigation, people underestimate their audience by about 3/4th.  This means that their guessed audience size is only about a fourth of the actual audience size.
 
 ***
 ### Faceting
-Notes:
+Notes: Faceting is the idea of splitting up graphs into multiple graphs based on a particular variable. **facet_wrap** is best used when generating plots for one variable. **facet_grid** is best used when you have two or more variables.
 
 ```{r Faceting}
-
+qplot(x=dob_day,data = pf) +
+  scale_x_discrete(breaks= 1:31) +
+  facet_wrap(~dob_month,ncol=3)
 ```
 
 #### Let’s take another look at our plot. What stands out to you here?
@@ -90,19 +92,20 @@ Notes:
 #### What code would you enter to create a histogram of friend counts?
 
 ```{r Friend Count}
-
+qplot(x=friend_count,data=pf)
 ```
 
 #### How is this plot similar to Moira's first plot?
 Response:
-
+The data
 ***
 
 ### Limiting the Axes
 Notes:
 
 ```{r Limiting the Axes}
-
+qplot(x=friend_count,data=pf) +
+  scale_x_continuous(limits=c(0,1000))
 ```
 
 ### Exploring with Bin Width
@@ -111,7 +114,10 @@ Notes:
 ***
 
 ### Adjusting the Bin Width
-Notes:
+Notes:Here we adjust the binwidth to get rid of the warning message in the console.  This is done by setting the *binwidth* parameter in the **qplot** function.  You can also adjust the breakpoints in the graph by using the *breaks* parameter in the **scale_x_continuous** function.  More information about scales function can be found [here](http://docs.ggplot2.org/current/scale_continuous.html)
+```{r Adjusting the Bin Width}
+qplot(x=friend_count,data = pf,binwidth = 25) + scale_x_continuous(limits = c(0,1000), breaks = seq(0,1000,50))
+```
 
 ### Faceting Friend Count
 ```{r Faceting Friend Count}
@@ -119,42 +125,50 @@ Notes:
 # Add it to the code below.
 qplot(x = friend_count, data = pf, binwidth = 10) +
   scale_x_continuous(limits = c(0, 1000),
-                     breaks = seq(0, 1000, 50))
+                     breaks = seq(0, 1000, 50)) +
+  facet_wrap(~gender)
 ```
 
 ***
 
 ### Omitting NA Values
 Notes:
-
+To omit the NA values in our gender column, we modify the data to take in the subset of data that does not have a NA value for gender. You can also perform this using the **na.omit()** function, but this may be too aggressive (It may omit genuine NA values).
 ```{r Omitting NA Values}
-
+qplot(x = friend_count, data = subset(pf, !is.na(gender)), binwidth = 10) +
+  scale_x_continuous(limits = c(0, 1000),breaks = seq(0, 1000, 50)) + 
+  facet_wrap(~gender)
 ```
 
 ***
 
 ### Statistics 'by' Gender
-Notes:
+Notes: To get the number of females and males can given using the **table** function.  To get the average number of friends by gender, you can use the **by** function. The **by** functions takes a parameter, how you want to split, and a function to run on the first two parameters.  We will use the **summary** function in this example
 
 ```{r Statistics \'by\' Gender}
+table(pf$gender)
+by(pf$friend_count,pf$gender,summary)
 
 ```
 
 #### Who on average has more friends: men or women?
-Response:
+Response: Women
 
 #### What's the difference between the median friend count for women and men?
-Response:
+Response: 22
 
 #### Why would the median be a better measure than the mean?
-Response:
+Response: Because the median is more robust and is not affected by outliers
 
 ***
 
 ### Tenure
-Notes:
+Notes: The *I()* function stands for 'as is' which tells qplot to use them as colors.
 
 ```{r Tenure}
+#Plot split based on days
+qplot(x=tenure,data=pf, binwidth = 30,
+      color = I('black'), fill = I('#099DD9'))
 
 ```
 
@@ -163,7 +177,9 @@ Notes:
 #### How would you create a histogram of tenure by year?
 
 ```{r Tenure Histogram by Year}
-
+#Plot split based on years
+qplot(x=tenure/365,data=pf, binwidth = 1,
+      color = I('black'), fill = I('#099DD9'))
 ```
 
 ***
@@ -172,7 +188,11 @@ Notes:
 Notes:
 
 ```{r Labeling Plots}
-
+qplot(x=tenure/365,data=pf, binwidth = 0.25,
+      xlab = 'Number of years using Facebook',
+      ylab = 'Numbers of users in sample',
+      color = I('black'), fill = I('#099DD9')) +
+  scale_x_continuous(limits = c(0,7), breaks = seq(1,7,1 ))
 ```
 
 ***
@@ -181,7 +201,11 @@ Notes:
 Notes:
 
 ```{r User Ages}
-
+qplot(x = age, data = pf, binwidth = 5,
+      xlab = "Age of users within a specific age range",
+      ylab = "Number of users within each age range",
+      color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(10,100), breaks = seq(0,100,10))
 ```
 
 #### What do you notice?
@@ -201,7 +225,16 @@ Notes:
 
 ### Transforming Data
 Notes:
+```{r Transforming Data}
+qplot(x = friend_count, data = pf)
 
+summary(pf$friend_count)
+
+summary(log10(pf$friend_count + 1))
+
+summary(sqrt(pf$friend_count))
+
+```
 ***
 
 ### Add a Scaling Layer
