@@ -1,3 +1,6 @@
+---
+output: html_document
+---
 Lesson 3
 ========================================================
 
@@ -5,11 +8,11 @@ Lesson 3
 
 ### What to Do First?
 Notes:
-
+When performing EDA on a single variable, you want to investigate and visualize how the data looks from various angles.  The first thing you should be looking at is which variables seem to be the most important in your dataset and important to your analysis. You want think back about what is important to questions that you are trying to answer.
 ***
 
 ### Pseudo-Facebook User Data
-Notes:
+Notes: the first step of EDA is loading in your dataset into R.  This is done by the **read_csv** function for this case.  You should note that this is a clean dataset.  You may need to perform data cleaning and munging techniquest before loading your data into R.
 
 ```{r Pseudo-Facebook User Data}
 setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
@@ -21,9 +24,8 @@ names(pf)
 
 ### Histogram of Users' Birthdays
 Notes:
-
+We use the **ggplot** library to generate graphs and plots of our data in R.  The **qplot** generates a histogram plot by default.
 ```{r Histogram of Users\' Birthdays}
-install.packages("ggplot2")
 library(ggplot2)
 qplot(x=dob_day, data=pf) +
   scale_x_discrete(breaks=1:31)
@@ -33,11 +35,13 @@ qplot(x=dob_day, data=pf) +
 
 #### What are some things that you notice about this histogram?
 Response:
+A large of people are born at the beginning of the month and the fewest number of people are born at the end of month.  Most of the values in between are almost uniform
 
 ***
 
 ### Moira's Investigation
-Notes:Moira investigation was about taking a set of Facebook users and performing a survey on the perceived audience size of their posts.  Participants were asked what percentage of their facebook users actually saw the post.  Link to the paper is [here](http://hci.stanford.edu/publications/2013/invisibleaudience/invisibleaudience.pdf)
+Notes:
+Moira investigation was about taking a set of Facebook users and performing a survey on the perceived audience size of their posts.  Participants were asked what percentage of their facebook users actually saw the post.  Link to the paper is [here](http://hci.stanford.edu/publications/2013/invisibleaudience/invisibleaudience.pdf)
 ***
 
 ### Estimating Your Audience Size
@@ -57,11 +61,11 @@ Response:40%
 ***
 
 ### Perceived Audience Size
-Notes: Based on Moira's Investigation, people underestimate their audience by about 3/4th.  This means that their guessed audience size is only about a fourth of the actual audience size.
+Notes: Based on Moira's Investigation, people underestimate their audience by about 3/4th.  This means that their guessed audience size is only about a fourth of the actual audience size.  When investigating this problem, Moira plotted a bunch of histograms.
 
 ***
 ### Faceting
-Notes: Faceting is the idea of splitting up graphs into multiple graphs based on a particular variable. **facet_wrap** is best used when generating plots for one variable. **facet_grid** is best used when you have two or more variables.
+Notes: Faceting is the idea of splitting up graphs into multiple graphs based on a particular variable. **facet_wrap** is best used when generating plots for one variable. **facet_grid** is best used when you have two or more variables. A link about Faceting is provided [here](http://www.cookbook-r.com/Graphs/Facets_(ggplot2)/)
 
 ```{r Faceting}
 qplot(x=dob_day,data = pf) +
@@ -71,19 +75,20 @@ qplot(x=dob_day,data = pf) +
 
 #### Let’s take another look at our plot. What stands out to you here?
 Response:
-
+That the abnormal spike seems to be on New Years Day
 ***
 
 ### Be Skeptical - Outliers and Anomalies
 Notes:
-
+Outliers can have many causes.  They could be an extreme case or could represent bad data, or the limitations of your data. For example, and extreme value could be replaced by a more normal value or vice versa.
 ***
 
 ### Moira's Outlier
 Notes:
+In Moira's case, there was one outlier that was in the extreme case, causing the plot to be a single bar.  After removing the outlier and change the scale to zoom in further, she was able to get a better picture of the data.  Sometimes outliers may need to be removed.
 #### Which case do you think applies to Moira’s outlier?
 Response:
-
+bad data about an extreme case
 ***
 
 ### Friend Count
@@ -97,12 +102,12 @@ qplot(x=friend_count,data=pf)
 
 #### How is this plot similar to Moira's first plot?
 Response:
-The data
+There is a huge spike around zero
 ***
 
 ### Limiting the Axes
 Notes:
-
+To avoid looking at long-tailed data, the axes needs to be adjusted.  This can be done using the **xlim** option as part of qplot, or entering an additional layer using **scale_x_continuous** layer.
 ```{r Limiting the Axes}
 qplot(x=friend_count,data=pf) +
   scale_x_continuous(limits=c(0,1000))
@@ -110,7 +115,7 @@ qplot(x=friend_count,data=pf) +
 
 ### Exploring with Bin Width
 Notes:
-
+In Moira's investigation, by adjusting the binwidth, she was able to see that most people guessed their perceived audience as numbers that mulitples of ten.  Very few people guessed numbers in between.
 ***
 
 ### Adjusting the Bin Width
@@ -143,7 +148,7 @@ qplot(x = friend_count, data = subset(pf, !is.na(gender)), binwidth = 10) +
 ***
 
 ### Statistics 'by' Gender
-Notes: To get the number of females and males can given using the **table** function.  To get the average number of friends by gender, you can use the **by** function. The **by** functions takes a parameter, how you want to split, and a function to run on the first two parameters.  We will use the **summary** function in this example
+Notes: To get the number of females and males can given using the **table** function.  To get the average number of friends by gender, you can use the **by** function. The **by** functions takes a parameter, how you want to split(a categorical variable or a list of indices), and a function to run on the first two parameters.  We will use the **summary** function in this example
 
 ```{r Statistics \'by\' Gender}
 table(pf$gender)
@@ -163,7 +168,7 @@ Response: Because the median is more robust and is not affected by outliers
 ***
 
 ### Tenure
-Notes: The *I()* function stands for 'as is' which tells qplot to use them as colors.
+Notes: The *I()* function stands for 'as is' which tells qplot to use them as colors. Link to ggplot's themes provided [here](http://docs.ggplot2.org/0.9.2.1/theme.html)
 
 ```{r Tenure}
 #Plot split based on days
@@ -186,7 +191,7 @@ qplot(x=tenure/365,data=pf, binwidth = 1,
 
 ### Labeling Plots
 Notes:
-
+Plots are labeled by using the **xlab** and **ylab** parameters in *qplot*. When performing EDA, it is not important for the graphs to be perfect, but good enough to perform the necessary analysis and gain insights.
 ```{r Labeling Plots}
 qplot(x=tenure/365,data=pf, binwidth = 0.25,
       xlab = 'Number of years using Facebook',
@@ -201,7 +206,7 @@ qplot(x=tenure/365,data=pf, binwidth = 0.25,
 Notes:
 
 ```{r User Ages}
-qplot(x = age, data = pf, binwidth = 5,
+qplot(x = age, data = pf, binwidth = 1,
       xlab = "Age of users within a specific age range",
       ylab = "Number of users within each age range",
       color = I('black'), fill = I('#099DD9')) + 
@@ -210,7 +215,7 @@ qplot(x = age, data = pf, binwidth = 5,
 
 #### What do you notice?
 Response:
-
+There are a large number of users between 10 and 20 and the number of users decreases as the age increases.
 ***
 
 ### The Spread of Memes
@@ -220,28 +225,43 @@ Notes:
 
 ### Lada's Money Bag Meme
 Notes:
-
+She noticed that the Money Bag Meme would seem to flare periodically around certain dates in the year. From the initial plot, it would seem that the meme died in between the spikes, but after changing the scale from linear to a log scale, you can see that the meme activity didn't die out completely.
 ***
 
 ### Transforming Data
 Notes:
+When data is *overdispersed*, we can transform the data by changing the scale.
 ```{r Transforming Data}
-qplot(x = friend_count, data = pf)
+
 
 summary(pf$friend_count)
 
 summary(log10(pf$friend_count + 1))
 
 summary(sqrt(pf$friend_count))
+#install.packages('gridExtra')
+library(gridExtra)
+#Original plot
+p1 <- qplot(x = friend_count, data = pf)
+p2 <- qplot(x= log10(pf$friend_count), data = pf,
+            color = I('black'), fill = I('#099DD9'))
+p3 <- qplot(x= sqrt(friend_count), data = pf,
+            color = I('black'), fill = I('#04ADF9'))
+grid.arrange(p1,p2,p3,ncol=1)
 
 ```
 ***
 
 ### Add a Scaling Layer
 Notes:
-
+When changing the data to a log10 scale, it changes the scale of the x-axis, whereas using the scale_x_log10 layer maintains the actual count axis.
 ```{r Add a Scaling Layer}
+p1 <- qplot(x=friend_count, data = pf,
+            color = I('black'), fill = I('#099DD9'))
+p2 <- p1 + scale_x_log10()
 
+p3 <- p1 + scale_x_sqrt()
+grid.arrange(p1,p2,p3,ncol=1)
 ```
 
 ***
@@ -250,7 +270,10 @@ Notes:
 ### Frequency Polygons
 
 ```{r Frequency Polygons}
-
+qplot(x = friend_count, y = ..count../sum(..count..),
+      data = subset(pf,!is.na(gender)), geom = 'freqpoly',
+      binwidth = 10,color = gender) +
+  scale_x_continuous(limits=c(0,1000),breaks=seq(0,1000,50))
 ```
 
 ***
@@ -258,8 +281,16 @@ Notes:
 ### Likes on the Web
 Notes:
 
+The www_likes count for males is 1,430,175. Females have more likes than males which is seen by the code below.
 ```{r Likes on the Web}
-
+qplot(x = www_likes,
+      data = subset(pf,!is.na(gender)), geom = 'freqpoly',
+      color = gender) +
+  scale_x_log10()
+  #scale_x_continuous(limits=c(0,5),breaks=seq(0,5,1)) +
+  #scale_y_continuous(limits=c(0,0.5), breaks=seq(0,0.5,0.010))
+summary(pf$www_likes)
+by(pf$www_likes,pf$gender,sum)
 ```
 
 
@@ -267,15 +298,22 @@ Notes:
 
 ### Box Plots
 Notes:
+Boxplots generates the Inter-quartile range for a distribution. the difference in boxplots than histograms is that the y-axis is going to be our friend count and the x-axis is going to be our categorical variable(gender)
 
+It is best use the *coord_cartesian* layer as it will not remove any values and will match up nicely with the summary function output.
 ```{r Box Plots}
-
+qplot(x = gender, y=friend_count,
+      data = subset(pf,!is.na(gender)), geom = 'boxplot') +
+  coord_cartesian(ylim=c(0,250))
+by(pf$friend_count,pf$gender,summary)
 ```
 
 #### Adjust the code to focus on users who have friend counts between 0 and 1000.
 
 ```{r}
-
+qplot(x = gender, y=friend_count,
+      data = subset(pf,!is.na(gender)), geom = 'boxplot') +
+  coord_cartesian(ylim=c(0,1000))
 ```
 
 ***
@@ -284,35 +322,50 @@ Notes:
 Notes:
 
 ```{r Box Plots, Quartiles, and Friendships}
+qplot(x = gender, y=friendships_initiated,
+      data = subset(pf,!is.na(gender)), geom = 'boxplot') +
+  coord_cartesian(ylim = c(0,150))
+
 
 ```
 
 #### On average, who initiated more friendships in our sample: men or women?
-Response:
+Response:Females
 #### Write about some ways that you can verify your answer.
 Response:
 ```{r Friend Requests by Gender}
-
+by(pf$friendships_initiated,pf$gender,summary)
 ```
 
 Response:
-
+I generated a boxplot on how many friendships were initiated by gender.  After generating this graph, I limited the y-axis by 1000.  Next, I shrunk the limit down by 150 which gave a better picture.  Then I ran the by() to get a summary of the values split by gender.  Females had a higher average as well as a higher median value.
 ***
 
 ### Getting Logical
 Notes:
-
+You may want to convert distributions that have a lot of zeros into logical data (true, or false).  Below we use the **ifelse** function.  This function takes the condition as the first parameter, the value of the if condition, followed by the value of the else condition.
 ```{r Getting Logical}
+summary(pf$mobile_likes)
+
+summary(pf$mobile_likes > 0)
+pf$mobile_check_in <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0,1,0)
+pf$mobile_check_in <- factor(pf$mobile_check_in)
+summary(pf$mobile_check_in)
+
+
+pf$mobile_check_in <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0,TRUE,FALSE)
+sum(pf$mobile_check_in > 0)/length(pf$mobile_check_in)
 
 ```
-
 Response:
-
+The percent of checkins using mobile is 65%
 ***
 
 ### Analyzing One Variable
 Reflection:
-
+How to generate plots that are histograms, frequency plots and boxplots.  Based on each of the plots, I learned how to vary the length of the scales and change the type of scale as well.  How to view multiple plots in a single plot and how to align them.  Also, how to view logical values to determine whether a feature was used on or not.
 ***
 
 Click **KnitHTML** to see all of your hard work and to have an html
