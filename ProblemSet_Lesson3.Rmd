@@ -1,0 +1,175 @@
+---
+title: "Problem Set Lesson 3"
+author: "Ransford Hyman Jr."
+date: "November 23, 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#library(ggplot2)
+data(diamonds)
+summary(diamonds)
+#?diamonds
+```
+
+Question #2: Below we generate a histogram for the prices of the diamonds in the diamond set.  The price distribution is a long-tailed distribution.  The median value is $2401 and the mean value is $3933 for this distribution.
+
+```{r,Histogram of Prices}
+qplot(x=diamonds$price, df = diamonds,
+      color = I('black'), fill = I('#099DD9'))
+summary(diamonds$price)
+```
+
+Question #3: Here we give some analysis about the number of diamonds that fit within a specific range
+```{r Analyzing using range}
+dim(subset(diamonds, price < 500))
+dim(subset(diamonds, price < 250))
+dim(subset(diamonds, price >= 15000))
+```
+Question #4: Exploring the spike in the histgram.  Here I will zoom in on the spike to see if there is anything interesting there.
+```{r}
+qplot(x=diamonds$price, df = diamonds, binwidth=50,
+      color = I('black'), fill = I('#099DD9')) +
+  scale_x_continuous(limits = c(250,2000), breaks= seq(250,2000,250))
+```
+Question #5: Generate graphs based on cut
+
+```{r}
+ggplot(diamonds,aes(x=price), binwidth=50) + 
+  geom_histogram(color = 'black',fill = 'blue') +
+  facet_wrap(~cut,ncol = 1)
+```
+
+Question #6: Zooming in on the facet wrap plot for highest priced diamond based on cut
+```{r}
+ggplot(diamonds,aes(x=price), binwidth=50) + 
+  geom_histogram(color = 'black',fill = 'blue') +
+  scale_x_continuous(limits=c(18000,20000),breaks = seq(18000,20000,250)) +
+  scale_y_continuous(limits=c(0,5)) +
+  facet_wrap(~cut,ncol = 1)
+
+```
+
+Question #6: Zooming in on the facet wrap plot for lowest priced diamond based on cut
+```{r}
+ggplot(diamonds,aes(x=price), binwidth=10) + 
+  geom_histogram(color = 'black',fill = 'blue') +
+  scale_x_continuous(limits=c(0,5000),breaks = seq(0,5000,250)) +
+  scale_y_continuous(limits=c(0,2)) +
+  facet_wrap(~cut,ncol = 1)
+
+```
+Question #6: Finding out summary info on diamonds by cut
+
+```{r}
+by(diamonds$price,diamonds$cut,summary)
+```
+
+Question #7: Generate graphs based on cut with better y axis
+
+```{r}
+ggplot(diamonds,aes(x=price), binwidth=50) + 
+  geom_histogram(color = 'black',fill = 'blue') +
+  facet_wrap(~cut,ncol = 1,scales='free_y')
+?facet_wrap
+```
+
+Question #8: Histogram of price per caret
+```{r}
+ggplot(diamonds,aes(x=price/carat)) + 
+  geom_histogram(binwidth=0.1,color = 'black',fill = 'blue') +
+  scale_x_log10() +
+  facet_wrap(~cut,ncol = 1,scales='free_y')
+str(diamonds)
+```
+
+Question #9: Generation of Boxplot based on price by cut
+```{r}
+ggplot(diamonds,aes(x=cut,y=price)) + 
+  geom_boxplot() +
+ coord_cartesian(ylim = c(0,8000))
+?diamonds
+```
+
+```{r}
+by(diamonds$price,diamonds$color,summary)
+IQR(subset(diamonds, color=="D")$price)
+str(diamonds)
+```
+
+Question #10: boxplots with price/caret over various colors
+```{r}
+ggplot(diamonds,aes(x=color,y=price/carat)) + 
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0,8000))
+  
+ 
+```
+
+Question #11: Frequency polygon of the various carats
+```{r}
+qplot(diamonds$carat, df=diamonds,binwidth=0.05,
+      geom = "freqpoly") + 
+  scale_x_continuous(limits=c(0,2),breaks=seq(0,2,0.25))
+summary(diamonds$carat)
+  
+```
+
+```{r}
+#install.packages("dplyr")
+library(tidyr)
+library(dplyr)
+devtools::install_github("rstudio/EDAWR")
+?gather
+```
+
+```{r GDP/employee analysis}
+setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
+gdp <- read.csv('indicator_gdp\ per\ employee.csv')
+#Remove the last row since it empty
+gdp <- gdp[1:128,]
+#Checking whether there are any NA values
+table(is.na(gdp$X1995))
+p0 <-ggplot(gdp, aes(x=X1990)) + xlab('GDP per employee in 1990 (in 1990 US dollars)') + ylab('Number of countries')
+p0 <- p0 + geom_freqpoly(color='red', binwidth=1000)
+p0 <-  p0 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
+#p0
+
+p1 <-ggplot(gdp, aes(x=X1995,color='blue')) + xlab('GDP per employee in 1995 (in 1990 US dollars)') + ylab('Number of countries')
+p1 <-  p1 + geom_freqpoly(color='blue',binwidth=1000)
+p1 <- p1 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
+#p1
+#Checking whether there are any NA values
+table(is.na(gdp$X2005))
+
+p2 <- ggplot(gdp, aes(x=X2005)) + xlab('GDP per employee in 2005 (in 1990 US dollars)') + ylab('Number of countries')
+p2 <- p2 + geom_freqpoly(color='green',binwidth=1000)
+p2 <- p2 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
+#p2
+
+p3 <- ggplot(gdp, aes(x=X2000)) + xlab('GDP per employee in 2000 (in 1990 US dollars)') + ylab('Number of countries')
+p3 <- p3 + geom_freqpoly(color='orange',binwidth=1000)
+p3 <- p3 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
+#p3
+library(gridExtra)
+grid.arrange(p0, p1,p3,p2,ncol=2)
+ggsave('gdp_per_employee_1990.jpg',p0)
+ggsave('gdp_per_employee_1995.jpg',p1)
+ggsave('gdp_per_employee_2000.jpg',p3)
+ggsave('gdp_per_employee_2005.jpg',p2)
+summary(gdp$X1990)
+summary(gdp$X1995)
+summary(gdp$X2000)
+summary(gdp$X2005)
+IQR(gdp$X1990)
+IQR(gdp$X1995)
+IQR(gdp$X2000,na.rm = TRUE)
+IQR(gdp$X2005,na.rm = TRUE)
+?IQR
+```
+My analysis of the GDP/employee data:
+I did some analysis on the GDP per employee data from the WorldBank. The data is from 128 countries over the period of 1980-2005. From the summary data, over the period of 1990-2005, the IQR steadily increased, but the maxiimum increased at a faster rate, and the minimum decreased every 5 year period except between 2000-2005. The data seems to show that more countries shifted into the IQR over time. If you view the frequency polygon plots in the links below, you will see that they all generate long-tailed graphs. If you view the last big spike in 1990 plot, you will see that spike shift in the positive direction after each 5 year period.
