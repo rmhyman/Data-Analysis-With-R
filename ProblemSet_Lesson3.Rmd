@@ -10,7 +10,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-#library(ggplot2)
+library(ggplot2)
 data(diamonds)
 summary(diamonds)
 #?diamonds
@@ -120,7 +120,7 @@ summary(diamonds$carat)
 ```
 
 ```{r}
-#install.packages("dplyr")
+#install.packages("tidyr")
 library(tidyr)
 library(dplyr)
 devtools::install_github("rstudio/EDAWR")
@@ -155,6 +155,7 @@ p3 <- ggplot(gdp, aes(x=X2000)) + xlab('GDP per employee in 2000 (in 1990 US dol
 p3 <- p3 + geom_freqpoly(color='orange',binwidth=1000)
 p3 <- p3 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
 #p3
+install.packages("gridExtra")
 library(gridExtra)
 grid.arrange(p0, p1,p3,p2,ncol=2)
 ggsave('gdp_per_employee_1990.jpg',p0)
@@ -173,3 +174,51 @@ IQR(gdp$X2005,na.rm = TRUE)
 ```
 My analysis of the GDP/employee data:
 I did some analysis on the GDP per employee data from the WorldBank. The data is from 128 countries over the period of 1980-2005. From the summary data, over the period of 1990-2005, the IQR steadily increased, but the maxiimum increased at a faster rate, and the minimum decreased every 5 year period except between 2000-2005. The data seems to show that more countries shifted into the IQR over time. If you view the frequency polygon plots in the links below, you will see that they all generate long-tailed graphs. If you view the last big spike in 1990 plot, you will see that spike shift in the positive direction after each 5 year period.
+
+```{r Facebook Friends' Birthday Analysis}
+setwd('C:\\Users\\rmhyman\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
+fbd <- read.csv('fbBirthdays.csv')
+fbdata <- subset(fbdata, select = c(Title,Start.date,Day.of.week))
+fbdata <- separate(fbdata,Start.date,c("Year","Month", "Day"))
+##Exclude the last row since it is a duplicate
+fbdata <- fbdata[1:824,]
+fbdata <- transform(fbdata,Day=as.numeric(Day))
+fbdata <- transform(fbdata,Month=as.numeric(Month))
+fb <- tbl_df(fbdata)
+summary(fb)
+p <- ggplot(fbdata,aes(Day)) +
+  geom_histogram(color='black',fill='blue',binwidth=1) +
+  scale_x_discrete(limits=c(1:31)) +
+  facet_wrap(~Day.of.week,ncol = 3)
+p
+
+p1 <- ggplot(fbdata,aes(Month)) +
+  geom_histogram(color='black',fill='blue') +
+  scale_x_discrete(limits=c(1:12)) +
+  facet_wrap(~Day.of.week,ncol = 3)
+p1
+
+ggsave('Histogram_by_month.jpg',p1)
+ggsave('Histogram_by_day.jpg',p)
+str(fbdata)
+table(fbdata$Day.of.week)
+?facet_wrap
+```
+
+```{r Birthday Inquiries}
+# How many people share your birthday? Do you know them?
+fbdata %>% filter(Day == 21 & Month == 8) 
+# (Reserve time with them or save money to buy them a gift!)
+
+# Which month contains the most number of birthdays?
+fbdata %>% group_by(Month) %>% summarise(n=n()) %>% arrange(desc(n))
+# How many birthdays are in each month?
+fbdata %>% group_by(Month) %>% summarise(n=n()) %>% arrange(desc(n))
+# Which day of the year has the most number of birthdays?
+
+fbdata %>% group_by(Month,Day) %>% summarise(n=n()) %>% arrange(desc(n))
+# Do you have at least 365 friends that have birthdays on everyday
+# of the year?
+unique <- fbdata %>% group_by(Day,Month) %>% count(Day,Month)
+dim(unique)
+```
