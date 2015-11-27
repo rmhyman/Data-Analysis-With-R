@@ -1,0 +1,104 @@
+---
+title: "Playing with tidyr and dplyr"
+author: "Ransford Hyman Jr."
+date: "November 26, 2015"
+output: html_document
+---
+In this document, I will be doing some exercises with the **tidyr** and the **dplyr** packages in R.  These packages are good for *Wrangling* and *Reshaping* data.  We will following the slides from [here](http://bit.ly/wrangling-webinar). Our first chunk of code will be to import the EDAWR package and use the datasets within it for wrangling and reshaping. We start with the *cases* dataset. R prefers data in a format such that each variable is in a single column and each row is an obersavation.  One way of reshaping data into this kind of format is using the **gather** function.
+
+```{r Using gather on the cases dataset }
+library(EDAWR)
+library(tidyr)
+?cases
+data(cases)
+summary(cases)
+names(cases)
+str(cases)
+
+cases_tidy <- cases %>% gather("year","n",2:4)
+```
+
+If you like at the structure of *cases_tidy* you will see that it is format that is ideal for performing EDA within R.  In the next example, we illustrate how to use the *spread* function on the *pollution* dataset.  This is another form of reshaping the data that works better with R.  In the pollution dataset, we have multiple observations for each city based on the size of the particulate measured.  We will use the spread function below to place the observations in separate columns based on their size. 
+
+```{r Using spread on the pollution dataset}
+data("pollution")
+?pollution
+pollution_tidy <- pollution %>% spread("size","amount")
+str(pollution_tidy)
+pollution_tidy
+```
+
+In the next example, we illustrate how to use the *separate* and *unite* functions, in particular, its use with date formats.  We show how to use both functions on the *storms* dataset to show how to break out a date format into separate columns and how to merge them back together.
+```{r Using the separate and unite functions on the storms dataset}
+data("storms")
+?storms
+str(storms)
+storms_mod <- storms %>% separate(date,c("year","month","day"),sep = "-")
+storms_mod
+storms_orig <- storms_mod %>% unite("date",year,month,day,sep = "-")
+storms_orig
+
+```
+
+Now we shift our attention to the **dplyr** package which is used to perform analysis on tidy data. Our first example will show uses of the **select** function on the storms dataset. The select function gives you the ability to extract a subset of columns from the original dataset.
+```{r Using select on the storms dataset}
+library(dplyr)
+#install.packages("nycflights13")
+#library(nycflights13)
+storm_pressure <- storms %>% select(storm,pressure)
+storm_pressure
+rm(storm_pressure)
+storm_wind <- storms %>% select(storm,wind)
+storm_wind
+rm(storm_wind)
+#Example using the range operator
+storm_without_date <- storms %>% select(storm:pressure)
+storm_without_date
+```
+
+Next we show the use of the **filter** function which extracts out observations based on specific criteria.
+```{r Using the filter function on storms dataset}
+powerful_storms <- storms %>% filter(wind >= 50)
+powerful_storms
+
+specific_storms <- storms %>% filter(storm %in% c("Alberto", "Alex", "Allison"))
+specific_storms
+```
+
+The **mutate** is used to create new variable columns from existing columns.
+```{r Using mutate on the storms dataset}
+storms_with_ratio <- storms %>% mutate(ratio = pressure/wind)
+storms_with_ratio
+```
+The **summarise** function is used to gather statiscal information based on a set functions passed as parameters to the function.
+
+```{r Using summarise on the pollution dataset}
+data("pollution")
+pollution %>% summarise(median=median(amount), variance=var(amount))
+```
+The **arrange** function allows you to sort the data based on a specific variable(column).  By default for numerics, it sorts in increasing order. If more than one variable is provided, it will sort based on the first parameter provided and then break ties by the following parameters provided.
+
+```{r Using the arrange function on storms data}
+data("storms")
+storms %>% arrange(wind)
+```
+
+Now we give an example using the **group_by** function.
+```{r Using group_by function}
+group_example <- pollution %>% group_by(city) %>% summarise(mean=mean(amount),sum=sum(amount), n=n())
+group_example
+```
+
+Now we show some usage of the *join* functions.  The **left_join** function joins the matching rows from both sets.  The **inner_join** function only joins rows that are in both sets.  The **semi_join** function on outputs the rows from the first set that matches rows in the second set.  The **anti_join** function outputs rows that do not match in both sets.
+```{r Using the join functions}
+songs
+artists
+left_join(songs,artists,by = "name")
+
+inner_join(songs,artists,by="name")
+
+semi_join(songs,artists,by="name")
+
+anti_join(songs,artists,by="name")
+
+```
