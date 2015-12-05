@@ -75,7 +75,7 @@ Question #7: Generate graphs based on cut with better y axis
 ggplot(diamonds,aes(x=price), binwidth=50) + 
   geom_histogram(color = 'black',fill = 'blue') +
   facet_wrap(~cut,ncol = 1,scales='free_y')
-?facet_wrap
+#?facet_wrap
 ```
 
 Question #8: Histogram of price per caret
@@ -92,7 +92,7 @@ Question #9: Generation of Boxplot based on price by cut
 ggplot(diamonds,aes(x=cut,y=price)) + 
   geom_boxplot() +
  coord_cartesian(ylim = c(0,8000))
-?diamonds
+#?diamonds
 ```
 
 ```{r}
@@ -123,12 +123,12 @@ summary(diamonds$carat)
 #install.packages("tidyr")
 library(tidyr)
 library(dplyr)
-devtools::install_github("rstudio/EDAWR")
-?gather
+#devtools::install_github("rstudio/EDAWR")
+#?gather
 ```
 
-```{r GDP/employee analysis}
-setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
+```{r GDP employee analysis}
+#setwd("C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3")
 gdp <- read.csv('indicator_gdp\ per\ employee.csv')
 #Remove the last row since it empty
 gdp <- gdp[1:128,]
@@ -155,7 +155,7 @@ p3 <- ggplot(gdp, aes(x=X2000)) + xlab('GDP per employee in 2000 (in 1990 US dol
 p3 <- p3 + geom_freqpoly(color='orange',binwidth=1000)
 p3 <- p3 + scale_x_continuous(limits=c(0,62000),breaks=seq(0,62000,10000))
 #p3
-install.packages("gridExtra")
+#install.packages("gridExtra")
 library(gridExtra)
 grid.arrange(p0, p1,p3,p2,ncol=2)
 ggsave('gdp_per_employee_1990.jpg',p0)
@@ -170,15 +170,15 @@ IQR(gdp$X1990)
 IQR(gdp$X1995)
 IQR(gdp$X2000,na.rm = TRUE)
 IQR(gdp$X2005,na.rm = TRUE)
-?IQR
+#?IQR
 ```
 My analysis of the GDP/employee data:
 I did some analysis on the GDP per employee data from the WorldBank. The data is from 128 countries over the period of 1980-2005. From the summary data, over the period of 1990-2005, the IQR steadily increased, but the maxiimum increased at a faster rate, and the minimum decreased every 5 year period except between 2000-2005. The data seems to show that more countries shifted into the IQR over time. If you view the frequency polygon plots in the links below, you will see that they all generate long-tailed graphs. If you view the last big spike in 1990 plot, you will see that spike shift in the positive direction after each 5 year period.
 
-```{r Facebook Friends' Birthday Analysis}
-setwd('C:\\Users\\rmhyman\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
+```{r Facebook Friends Birthday Analysis}
+#setwd('C:\\Users\\rmhyman\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
 fbd <- read.csv('fbBirthdays.csv')
-fbdata <- subset(fbdata, select = c(Title,Start.date,Day.of.week))
+fbdata <- subset(fbd, select = c(Title,Start.date,Day.of.week))
 fbdata <- separate(fbdata,Start.date,c("Year","Month", "Day"))
 ##Exclude the last row since it is a duplicate
 fbdata <- fbdata[1:824,]
@@ -202,7 +202,7 @@ ggsave('Histogram_by_month.jpg',p1)
 ggsave('Histogram_by_day.jpg',p)
 str(fbdata)
 table(fbdata$Day.of.week)
-?facet_wrap
+#?facet_wrap
 ```
 
 ```{r Birthday Inquiries}

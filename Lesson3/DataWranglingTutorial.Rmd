@@ -9,7 +9,7 @@ In this document, I will be doing some exercises with the **tidyr** and the **dp
 ```{r Using gather on the cases dataset }
 library(EDAWR)
 library(tidyr)
-?cases
+#?cases
 data(cases)
 summary(cases)
 names(cases)
@@ -22,7 +22,7 @@ If you like at the structure of *cases_tidy* you will see that it is format that
 
 ```{r Using spread on the pollution dataset}
 data("pollution")
-?pollution
+#?pollution
 pollution_tidy <- pollution %>% spread("size","amount")
 str(pollution_tidy)
 pollution_tidy
@@ -31,7 +31,7 @@ pollution_tidy
 In the next example, we illustrate how to use the *separate* and *unite* functions, in particular, its use with date formats.  We show how to use both functions on the *storms* dataset to show how to break out a date format into separate columns and how to merge them back together.
 ```{r Using the separate and unite functions on the storms dataset}
 data("storms")
-?storms
+#?storms
 str(storms)
 storms_mod <- storms %>% separate(date,c("year","month","day"),sep = "-")
 storms_mod

@@ -1,0 +1,78 @@
+---
+title: "ProblemSet_Lesson4"
+author: "Ransford Hyman Jr."
+date: "December 2, 2015"
+output: html_document
+---
+This document is used to implement my solutions for Lesson 4 problem set for future reference.
+
+```{r}
+data("diamonds")
+names(diamonds)
+
+ggplot(diamonds,aes(x=x,y=price)) + geom_point()
+
+```
+
+##Obersavations of scatterplots
+Majority of the obersavations lie below the $10000.  The overall trend is exponential. Majority of the plots reside within 3 and 9 on the x-axis.
+```{r}
+cor.test(diamonds$price,diamonds$x)
+cor.test(diamonds$price,diamonds$y)
+cor.test(diamonds$price,diamonds$z)
+
+```
+
+
+```{r}
+ggplot(diamonds,aes(x=depth,y=price)) + geom_point(alpha=1/100) +
+  scale_x_continuous(limits=c(53,65),breaks=seq(55,65,2))
+
+summary(diamonds$depth)
+cor.test(diamonds$price,diamonds$depth)
+```
+
+```{r}
+ggplot(diamonds,aes(x=carat,y=price)) + geom_point() +
+  xlim(0,quantile(diamonds$carat,0.99)) + 
+  ylim(0,quantile(diamonds$price,0.99))
+```
+
+```{r}
+diamonds$volume <- diamonds$x * diamonds$y * diamonds$z
+ggplot(diamonds,aes(x=volume,y=price)) + geom_point()
+
+diamonds_limited_vol <- subset(diamonds, volume > 0 & volume < 800)
+cor.test(diamonds_limited_vol$price,diamonds_limited_vol$volume)
+```
+#Obersavations on Price vs. volume plot
+There is an exponential growth pattern and most of the volume resides below 500.
+
+```{r}
+ggplot(diamonds_limited_vol,aes(x=volume,y=price)) + geom_point(alpha=1/50) + geom_smooth() +
+  scale_x_continuous(limits=c(0,400))
+```
+
+```{r}
+library(dplyr)
+diamondsByClarity <- diamonds %>% group_by(clarity) %>% summarise(mean_price = mean(price),median_price = median(price),min_price = min(price), max_price = max(price), n= n())
+diamondsByClarity
+```
+
+```{r}
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+names(diamonds_mp_by_clarity)
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+
+p1 <- ggplot(diamonds_mp_by_clarity, aes(x=clarity,y=mean_price)) + geom_bar(stat="identity")
+p2 <- ggplot(diamonds_mp_by_color,aes(y=mean_price,x=color)) + geom_bar(stat="identity")
+grid.arrange(p1,p2,ncol=1)
+```
+
+#Obersavations about bar charts
+The maximum mean price in clarity is under SI2 and the minimum is VVS1.  Most of the mean prices related to clarity resides around $4000.  The mean price based on color seems to increase almost linearly.  Based on the plots, it seems that color has a stronger correlation with mean price than clarity.
+
+```{r}
+```

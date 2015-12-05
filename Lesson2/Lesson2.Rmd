@@ -44,7 +44,7 @@ Replace YOUR_NAME with your actual name in the vector 'udacious' and run the cod
 udacious <- c("Chris Saden", "Lauren Castellano",
               "Sarah Spikes","Dean Eckles",
               "Andy Brown", "Moira Burke",
-              "Kunal Chawla", YOUR_NAME)
+              "Kunal Chawla",'Ransford Hyman')
 ```
 
 Notice how R updates 'udacious' in the workspace. It should now say something like 'chr[1:8]'.  Run the following two lines of code. You can highlight both lines of code and run them.
@@ -148,15 +148,15 @@ tail(mtcars, 3)
 ```
 
 We've run nine commands so far:
-- c
-- nchar
-- data
-- str
-- dim
-- names
-- row.names
-- head
-- tail.
+* c
+* nchar
+* data
+* str
+* dim
+* names
+* row.names
+* head
+* tail.
 
 
 All of these commands took some inputs or arguments. To determine if a command takes more arguments or to learn about any default settings, you can look up the documentation using '?' before the command, much like you did to learn about the mtcars data set and the row.names

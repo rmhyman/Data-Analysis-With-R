@@ -1,0 +1,320 @@
+Lesson 4
+========================================================
+
+***
+
+### Scatterplots and Perceived Audience Size
+Notes:
+
+***
+
+### Scatterplots
+Notes:
+
+```{r Scatterplots}
+setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson3')
+pf <- read.csv('pseudo_facebook.tsv', sep='\t')
+#install.packages("ggplot2")
+library(ggplot2)
+ggplot(pf,aes(x=age,y=friend_count)) + geom_point()
+```
+
+***
+
+#### What are some things that you notice right away?
+Response:
+People under the age have a higher concentration of large friend counts than any other age group.  Also there people over 90 that have quite a large amount of friends which seems supsicious.
+***
+
+### ggplot Syntax
+Notes:
+
+```{r ggplot Syntax}
+summary(pf$age)
+ggplot(pf,aes(x=age,y=friend_count)) + geom_point() + xlim(13,90)
+```
+
+***
+
+### Overplotting
+Notes: The *alpha* parameter in geom_point makes each 20 points in the scatter plot equal to 1 point in the new graph to remove some of the noise.  To the plot more smoother instead of having all points line up in straight lines, we use the **geom_jitter** function
+
+```{r Overplotting}
+ggplot(pf,aes(x=age,y=friend_count)) + geom_point(alpha=1/20) + xlim(13,90)
+
+ggplot(pf,aes(x=age,y=friend_count)) + geom_jitter(alpha=1/20) + xlim(13,90)
+```
+
+#### What do you notice in the plot?
+Response:
+Majority of the population has friends under 1000.  The plot looks more like a long-tailed distribution.
+***
+
+### Coord_trans()
+Notes:
+
+```{r Coord_trans()}
+#?coord_trans
+ggplot(pf,aes(x=age,y=friend_count)) + geom_jitter(alpha=1/20) + xlim(13,90) +
+  ylim(1,5000) + coord_trans(y ="sqrt")
+```
+
+#### Look up the documentation for coord_trans() and add a layer to the plot that transforms friend_count using the square root function. Create your plot!
+
+```{r}
+
+```
+
+#### What do you notice?
+
+***
+
+### Alpha and Jitter
+Notes:
+
+```{r Alpha and Jitter}
+summary(pf$friendships_initiated)
+ggplot(pf,aes(x=age,y=friendships_initiated)) + geom_jitter(alpha = 1/20,position = position_jitter(h = 0)) + coord_trans(y="sqrt") +
+  xlim(13,90)
+```
+
+***
+
+### Overplotting and Domain Knowledge
+Notes:
+
+***
+
+### Conditional Means
+Notes:
+
+```{r Conditional Means}
+library(dplyr)
+pf_summarise <- pf %>% group_by(age) %>% summarise(friend_mean = mean(friend_count), friend_median = median(friend_count),n = n())
+
+pf_summarise
+```
+
+Create your plot!
+
+```{r Conditional Means Plot}
+ggplot(pf_summarise,aes(x=age,y=friend_mean)) + geom_line()
+
+summary(pf_summarise$friend_mean)
+```
+
+***
+
+### Overlaying Summaries with Raw Data
+Notes:He we generate a plot which has the orginal friend_count data in **orange**, then we overlay that data with a line plot of the average friend mean, the 10 percent quantile, the 90 percent quantile and the 50 percent quantile.
+
+```{r Overlaying Summaries with Raw Data}
+ggplot(pf,aes(x=age,y=friend_count)) + geom_jitter(alpha=1/20,position = position_jitter(h=0),color='orange') + xlim(13,90) + coord_trans(y ="sqrt") +
+  geom_line(stat = 'summary',fun.y=mean) +
+  geom_line(stat = 'summary',fun.y=quantile,probs=0.1,
+            linetype = 2, color='blue') +
+  geom_line(stat = 'summary',fun.y=quantile,probs=0.9,
+            linetype = 2, color='blue') +
+  geom_line(stat = 'summary',fun.y=quantile,probs=0.5,
+             color='blue')
+```
+
+#### What are some of your observations of the plot?
+Response:
+
+***
+
+### Moira: Histogram Summary and Scatterplot
+See the Instructor Notes of this video to download Moira's paper on perceived audience size and to see the final plot.
+
+Notes:
+
+***
+
+### Correlation
+Notes:
+
+```{r Correlation}
+#?cor.test
+
+cor.test(pf$friend_count,pf$age)
+```
+
+Look up the documentation for the cor.test function.
+
+What's the correlation between age and friend count? Round to three decimal places.
+Response:
+
+***
+
+### Correlation on Subsets
+Notes:
+
+```{r Correlation on Subsets}
+with(subset(pf,age <=70), cor.test(age, friend_count))
+```
+
+***
+
+### Correlation Methods
+Notes:
+
+***
+
+## Create Scatterplots
+Notes:
+
+```{r}
+names(pf)
+ggplot(pf,aes(x=www_likes_received,y=likes_received)) + geom_jitter(alpha=1/100,position = position_jitter(w=0,h=0)) +
+  coord_trans(x="sqrt", y="sqrt") + ylim(0,500) +
+  scale_x_continuous(limits=c(0,500),breaks=seq(0,500,20))
+```
+
+***
+
+### Strong Correlations
+Notes:
+
+```{r Strong Correlations}
+ggplot(pf,aes(x=www_likes_received,y=likes_received)) + geom_point() +
+  xlim(0,quantile(pf$www_likes_received,0.95)) +
+  ylim(0,quantile(pf$likes_received,0.95)) +
+  geom_smooth(method = 'lm', color= 'red')
+```
+
+What's the correlation betwen the two variables? Include the top 5% of values for the variable in the calculation and round to 3 decimal places.
+
+```{r Correlation Calcuation}
+with(pf,cor.test(www_likes_received,likes_received,method='pearson'))
+```
+
+Response:
+
+***
+
+### Moira on Correlation
+Notes:
+
+***
+
+### More Caution with Correlation
+Notes:
+
+```{r More Caution With Correlation}
+#install.packages('alr3')
+library(alr3)
+data("Mitchell")
+#?Mitchell
+```
+
+Create your plot!
+
+```{r Temp vs Month}
+names(Mitchell)
+
+ggplot(Mitchell,aes(x=Month,y=Temp)) + geom_point()
+```
+
+***
+
+### Noisy Scatterplots
+a. Take a guess for the correlation coefficient for the scatterplot.
+0.02
+b. What is the actual correlation of the two variables?
+(Round to the thousandths place)
+0.057
+
+```{r Noisy Scatterplots}
+with(Mitchell,cor.test(Month,Temp))
+```
+
+***
+
+### Making Sense of Data
+Notes:
+
+```{r Making Sense of Data}
+
+summary(Mitchell$Month)
+ggplot(Mitchell,aes(x=Month,y=Temp)) + geom_point() +
+  scale_x_discrete(breaks=seq(0,203,11))
+```
+
+***
+
+### A New Perspective
+
+What do you notice?
+Response:
+There is sort of a cyclic pattern among the points.  The peaks are in the middle of the year and lower temperature points are in  beginning and end of the year.
+
+Watch the solution video and check out the Instructor Notes!
+Notes:
+
+***
+
+### Understanding Noise: Age to Age Months
+Notes:
+
+```{r Understanding Noise: Age to Age Months}
+ggplot(pf_summarise,aes(x=age,y=friend_mean)) + geom_line()
+
+summary(pf_summarise$friend_mean)
+
+head(pf_summarise,10)
+pf_summarise[17:19,]
+pf$age_with_months <- pf$age + ((12-pf$dob_month)/12)
+```
+
+***
+
+### Age with Months Means
+
+```{r Age with Months Means}
+pf.fc_by_age_months <- pf %>% group_by(age_with_months) %>% summarise(friend_count_mean = mean(friend_count),friend_count_median = median(friend_count), n = n())
+```
+
+Programming Assignment
+```{r Programming Assignment}
+ggplot(pf.fc_by_age_months, aes(x=age_with_months,y=friend_count_mean)) + geom_line() + xlim(13,70)
+```
+
+***
+
+### Noise in Conditional Means
+
+```{r Noise in Conditional Means}
+p1 <- ggplot(subset(pf_summarise, age < 71),aes(x=age,y=friend_mean)) + geom_line() + geom_smooth()
+p2 <- ggplot(subset(pf.fc_by_age_months, age_with_months < 71), aes(x=age_with_months,y=friend_count_mean)) + geom_line() + geom_smooth()
+
+p3 <- ggplot(subset(pf_summarise, age < 71),aes(x=round(age/5) * 5,y=friend_mean)) + geom_line(stat = 'summary', fun.y=mean)
+
+library(gridExtra)
+grid.arrange(p1,p2,p3, ncol = 1)
+```
+
+***
+
+### Smoothing Conditional Means
+Notes:
+
+```{r Smoothing Conditional Means}
+
+```
+
+***
+
+### Which Plot to Choose?
+Notes:
+
+***
+
+### Analyzing Two Variables
+Reflection:
+I learned how to perform Expoloratory Data Analysis on two variables at a time by using scatter plots, and line plots.  We saw how using jitter can make the visualization more smoother in scatter plots and changing the scale can allow you to get more insights on data that may be bunched together.  We also learned how to view multiple plots on a single graph and how to view them using different line types and colors.  We also learned how to view things using conditional means and grouping data by a specific variable to get more insights.  Lastly, we discussed how to use the line fitting feature in ggplot to get a better insight of the data, but how can mislead you as well.  This was apart of removing the noise in the data.
+***
+
+Click **KnitHTML** to see all of your hard work and to have an html
+page of this lesson, your answers, and your notes!
+
