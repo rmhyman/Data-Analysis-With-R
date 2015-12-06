@@ -75,4 +75,89 @@ grid.arrange(p1,p2,ncol=1)
 The maximum mean price in clarity is under SI2 and the minimum is VVS1.  Most of the mean prices related to clarity resides around $4000.  The mean price based on color seems to increase almost linearly.  Based on the plots, it seems that color has a stronger correlation with mean price than clarity.
 
 ```{r}
+setwd("C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson4")
+d1 <- read.csv("indicator CDIAC carbon_dioxide_cumulative_emissions.csv")
+d2 <- read.csv("indicator_drought affected.csv")
+d3 <- read.csv("indicator_epidemic affected.csv")
+d4 <- read.csv("indicator_extreme temp affected.csv")
+d5 <- read.csv("indicator_flood affected.csv")
+d6 <- read.csv("military expenditure.csv")
+dim(subset(d6, !is.na(X1988)))
+tail(names(d1))
+```
+By analyzing the data frames, we will the subset from 2004-2008 to see which year has the most data.
+```{r Wrangle Data}
+names(d6)
+df_co2 <- subset(d1,select = c(CO2.emissions.from.fossil.fuels.since.1751..metric.tons., X2008))
+df_drought <- subset(d2,select = c(Drought.affected,X2008))
+df_epidemic <- subset(d3,select = c(Epidemic.affected,X2008))
+df_extreme_temp <- subset(d4,select = c(Extreme.temp.affected,X2008))
+df_flood <- subset(d5,select = c(Flood.affected,X2008))
+df_military <- subset(d6,select = c(Military.expenditure....of.GDP.,X2008))
+rm(d1,d2,d3,d4,d5,d6)
+
+df_co2 <- subset(df_co2,!is.na(X2008))
+df_drought <- subset(df_drought,!is.na(X2008))
+df_epidemic <- subset(df_epidemic,!is.na(X2008))
+df_extreme_temp <- subset(df_extreme_temp,!is.na(X2008))
+df_flood <- subset(df_flood,!is.na(X2008))
+df_military <- subset(df_military,!is.na(X2008))
+```
+Now that the data has been sliced for the year 2008 of each data frame, we will now rename the first column to "country" and try to join as much data using the **join** functions
+
+```{r Reshaping Data}
+library(dplyr)
+df_co2 <- df_co2 %>% rename(country = CO2.emissions.from.fossil.fuels.since.1751..metric.tons., co2 =X2008 )
+df_drought <- df_drought %>% rename(country = Drought.affected,drought = X2008 )
+df_epidemic <- df_epidemic %>% rename(country = Epidemic.affected, epidemic = X2008)
+df_extreme_temp <- df_extreme_temp %>% rename(country = Extreme.temp.affected, extreme_temp = X2008)
+df_flood <- df_flood %>% rename(country = Flood.affected, flood = X2008)
+df_military <- df_military %>% rename(country = Military.expenditure....of.GDP., military_gdp = X2008)
+
+
+final_df <- inner_join(df_extreme_temp,df_drought,by = "country")
+final_df <- inner_join(final_df,df_epidemic,by="country")
+final_df <- inner_join(final_df,df_military, by = "country")
+final_df <- inner_join(final_df,df_flood,by = "country")
+final_df <- inner_join(final_df,df_co2, by = "country")
+str(final_df)
+climate_data <- subset(final_df, select = c(-extreme_temp,-drought,-epidemic))
+climate_data
+```
+
+Since the extreme temp, drought, and epidemic observations were majority zero, I removed them from our final dataset.  We will perform analysis on military_gdp and flood and co2 data observations.
+
+```{r EDA}
+p1 <- ggplot(climate_data, aes(x = co2, y = military_gdp)) + geom_line() + scale_x_log10() + geom_smooth()
+
+p1 <- p1 + xlab("Cumaltive CO2 emissions(metric_tons)") + ylab("Miltary expenditure(% of GDP)")
+p2 <- ggplot(climate_data, aes(x = co2, y = flood )) + geom_line() + scale_x_log10() + scale_y_log10()
+p2 <- p2 + xlab("Cumaltive CO2 emissions(metric_tons)") + ylab("# of affected,injured, or killed by flood")
+p3 <- ggplot(subset(climate_data, flood > 0), aes(x = co2, y = flood )) + geom_line() + scale_x_log10() + scale_y_log10() + geom_smooth()
+p3 <- p3 + xlab("Cumaltive CO2 emissions(metric_tons)") + ylab("# of affected,injured, or killed by flood")
+library(gridExtra)
+grid.arrange(p1,p3, ncol=1)
+ggsave("military_spending_vs_co2.jpg",p1)
+ggsave("flood_vs_co2_full.jpg",p2)
+ggsave("flood_vs_co2_smooth.jpg",p3)
+
+```
+
+```{r Summary Statistics}
+min(climate_data$military_gdp)
+max(climate_data$military_gdp)
+median(climate_data$military_gdp)
+IQR(climate_data$military_gdp)
+
+min(climate_data$co2)
+max(climate_data$co2)
+median(climate_data$co2)
+IQR(climate_data$co2)
+
+min(climate_data$flood)
+max(climate_data$flood)
+median(climate_data$flood)
+IQR(climate_data$flood)
+cor.test(climate_data$military_gdp,climate_data$co2)
+cor.test(climate_data$flood,climate_data$co2)
 ```
