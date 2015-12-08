@@ -108,7 +108,9 @@ ggplot(aes(x = age, y = friend_count),
 Notes:
 
 ```{r Plot the Grand Mean}
-
+ggplot(aes(x = age, y = friend_count),
+       data = subset(pf, !is.na(year_joined.bucket))) + geom_line(aes(color = year_joined.bucket), stat = 'summary', fun.y = mean) +
+  geom_line(stat = 'summary', fun.y=mean, linetype =2 )
 ```
 
 ***
@@ -117,7 +119,8 @@ Notes:
 Notes:
 
 ```{r Friending Rate}
-
+pf <- subset(pf,tenure >=1) %>% mutate(friend_rate = friend_count/tenure)
+summary(pf$friend_rate)
 ```
 
 ***
@@ -125,12 +128,13 @@ Notes:
 ### Friendships Initiated
 Notes:
 
-What is the median friend rate?
+What is the median friend rate? 0.2205
 
-What is the maximum friend rate?
+What is the maximum friend rate? 417
 
 ```{r Friendships Initiated}
-
+ggplot(aes(x = tenure, y = friendships_initiated/tenure),
+       data = subset(pf, !is.na(year_joined.bucket) & tenure >=1)) + geom_line(aes(color = year_joined.bucket), stat = 'summary', fun.y = mean)
 ```
 
 ***
@@ -182,7 +186,10 @@ Notes:
 Notes:
 
 ```{r Histograms Revisited}
-
+setwd('C:\\Users\\ransf\\OneDrive\\Documents\\GitHub\\Data-Analysis-With-R\\Lesson5')
+yo <- read.csv('yogurt.csv')
+yo$id <- factor(yo$id)
+str(yo)
 ```
 
 ***
